@@ -1,0 +1,510 @@
+---
+title: "Analysis 10X dataset"
+output:
+  html_document:
+    fig_caption: yes
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    toc_depth: 3
+    number_sections: true
+    theme: cerulean
+editor_options:
+  chunk_output_type: console
+params:
+  prefix: "combined"
+  resDEG: "SCT_snn_res.0.25"
+  percent.mito: 0.25
+  cell.source: "human"
+  harmonize: FALSE
+  sample.names: !r c("KD_AL_OCM_1","KD_AL_OCM_2","KD_AL_OCM_3","KD_AL_OCM_4")
+---
+
+
+```{r setup, include=FALSE, cache=FALSE}
+library(future)
+#plan("multiprocess", workers = 8)
+options(future.globals.maxSize = 8000 * 1024^2)
+
+ifelse(dir.exists("/mnt/scc/project_workspace/"),
+       cremwd <- "/mnt/scc/",
+       cremwd <- "/restricted/projectnb/crem-bioinfo/")
+master_path <- file.path(cremwd, "/project_workspace/25_06_24_lauren/RNA/calculations/analysis/")
+prefix <- 'combined'
+calculations_path <- paste0(master_path, prefix, "/")
+plots_path <- file.path(calculations_path, "plots/")
+rds_path <- file.path(calculations_path, "rds/")
+cache_path <- file.path(calculations_path, "cache/") # it must end in a slash
+dir.create(rds_path, recursive = T)
+dir.create(plots_path, recursive = T)
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE,error = FALSE,warning = FALSE, cache = TRUE, cache.path = cache_path, fig.width=9,fig.height=7, autodep=TRUE, collapse = FALSE, fig.path = plots_path, fig.keep = "all", comment = "##", dev = c("png", "pdf"), cache.lazy = FALSE)   
+options(tibble.print_max = 150)
+
+library(tidyverse)
+library(Seurat)
+library(Matrix)
+library(matrixStats) #rowVars
+library(magrittr)
+library(dplyr)
+library(RColorBrewer)
+library(kableExtra)
+library(data.table) # getting counts
+library(knitr)
+library(clustree)
+library(patchwork)
+library(harmony)
+```
+
+
+```{r load_objects, eval=FALSE}
+sc <- readRDS(paste0(rds_path, "sc.Rds"))
+```
+
+```{r load_and_merge_from_scratch, eval=T}
+
+seu.list <- list()
+sample.names <- params$sample.names
+for (i in 1:length(sample.names)) {
+  seu.list[[i]] <- readRDS(paste0(master_path, sample.names[i], "/rds/sc.Rds"))
+# seu.list[[i]] <- UpdateSeuratObject(seu.list[[i]])
+  seu.list[[i]]@project.name <- sample.names[i]
+  #seu.list[[i]]$orig.ident <- sub("KD_AA_0304_", "", seu.list[[i]]$orig.ident)
+  DefaultAssay(seu.list[[i]]) <- "RNA" # make default RNA, so that SCT can be removed
+  seu.list[[i]] <- DietSeurat(seu.list[[i]], counts = TRUE, scale.data = FALSE, assays = "RNA")
+}
+sc <- merge(seu.list[[1]], y = seu.list[-1], project = "sc")
+#sc$annot <- paste0(sc$orig.ident, "_EPCAM_", sc$EPCAM_state)
+```
+
+
+
+# QC filtering
+
+```{r load_sc_qc, fig.height=4}
+#cat("UMI counts per cell")
+#summary(apply(GetAssayData(sc, slot = "counts"), 2, sum))
+#cat("UMI counts per gene")
+#summary(apply(GetAssayData(sc, slot = "counts"), 1, sum))
+
+Idents(sc) <- "orig.ident"
+
+cat("After filtering doublets and degraded cells")
+p <- VlnPlot(sc, features = c("nFeature_RNA", "nCount_RNA", "percent.mito"), pt.size = 0.1) 
+p <- p & ggmin::theme_powerpoint() & theme(axis.title.x = element_blank()) & NoLegend() & RotatedAxis()
+p
+ggsave(paste0(plots_path, "Vln.qc.after.pdf"))
+sc
+
+
+#p <- VlnPlot(sc, features = c("TBX4", "TBX5", "FOXF1", "PTCH1", "GLI1", "WNT2","MSC", "WNT4","WT1","KDR","HAND1","PRRX1"),stack = TRUE,flip = TRUE, pt.size = 0.1) 
+#p <- p & ggmin::theme_powerpoint() & theme(axis.title.x = element_blank()) & NoLegend() & RotatedAxis()
+#p
+#ggsave(paste0(plots_path, "Vln.qc.after.pdf"))
+
+
+#p <- Stacked_VlnPlot(seurat_object = sc, features = c("TBX4", "TBX5", "FOXF1", "PTCH1", "GLI1", "WNT2","MSC", "WNT4","WT1","KDR","HAND1","PRRX1"), x_lab_rotate = TRUE)
+
+#ncols=c('#F8766D','#F8766D','#F8766D','#1F78B4','#1F78B4','#1F78B4','#1F78B4')
+
+```
+
+```{r interesting_genes}
+interesting_genes <- c(
+  "NKX2-1", "EGFP-EXTRA", "TDTOMATO_EXTRA_IVS", "MCHERRY-FRT", "SFTA3", "SFTPB", "SOX2",      
+  "AFP", "ALB",
+  "TFF1", # gut/gastric
+  "CDX2", # intestinal
+  "SCGB3A2", # type 2 cells
+  "TOP2A", "AURKB", "MKI67", "BIRC5", # cell cycle
+  "TP63", "KRT5",
+  "SCGB1A1",
+  "SFTPC", "TFF2",
+  "SOX9",
+  "HP",
+  "FOXJ1",
+  "BMP3", "FOXP2", "CPM", "FGF9",
+  "NKD1",
+  "GIF", "CLDN18", "MUC6",
+  "TF", "APOA1", "CYP4F3", "CYP3A7",
+  "PAX9", "KRT14",
+  "SFTA2", "AQP4",
+  "AXIN2",
+  "CFTR",
+  "FOXI1", "ASLC3")
+firstup <- function(x) {
+  x <- tolower(x)
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  x
+}
+if(params$cell.source == "mouse") { interesting_genes <- c(firstup(interesting_genes), "GFP", "TDTOMATO","MCHERRY-FRT","LACZ") }
+cat("Pre-selected genes: ", interesting_genes)
+interesting_genes <- interesting_genes[interesting_genes %in% rownames(sc)]
+cat("Pre-selected genes expressed in current dataset: ", interesting_genes)
+```
+
+# Dimensionality reduction
+
+Regressing out the confounding effect of cell degradation (by modeling the mitochondrial percentage as a latent variable).
+
+```{r dim_red_pca}
+sc <- SCTransform(sc, vars.to.regress="percent.mito", verbose = FALSE) %>% RunPCA(verbose = FALSE)
+ElbowPlot(sc, 50)
+ggsave(paste0(plots_path, "elbow.pdf"))
+
+if(params$harmonize) {
+  sc <- RunHarmony(sc, assay.use = "SCT", group.by.vars = "orig.ident")
+  p1 <- DimPlot(sc, reduction = "pca", group.by = "orig.ident")
+  p2 <- DimPlot(sc, reduction = "harmony", group.by = "orig.ident")
+  p <- p1 + p2 & ggmin::theme_powerpoint() & NoAxes()
+  print(x = sc[['harmony']], dims = 1:5, nfeatures = 5, projected = FALSE)
+} else {
+  p <- DimPlot(sc, reduction = "pca", group.by = "orig.ident") & ggmin::theme_powerpoint() & NoAxes()
+  print(x = sc[['pca']], dims = 1:5, nfeatures = 5, projected = FALSE)
+}
+p
+```
+
+These are the genes driving the first 9 principal components
+
+```{r dim_heatmap, fig.height=11}
+if(params$harmonize) {
+  DimHeatmap(sc, reduction = "harmony", dims = 1:9, cells = 500, balanced = TRUE)
+  } else {
+  DimHeatmap(sc, dims = 1:9, cells = 500, balanced = TRUE)
+}
+```
+
+# Clustering
+
+Use UMAP for non-linear dimensionality reduction
+
+Use Louvain algorithm for community detection.
+
+```{r cluster_and_rdim, eval=TRUE, results=FALSE}
+if(params$harmonize) {
+  sc <- FindNeighbors(sc , reduction = "harmony", dims = 1:40, graph.name = "Harmony")        
+  sc <- FindClusters(sc, resolution = seq(1.5, 0.25, -0.25), graph.name = "Harmony") # reverse order, seurat_clusters takes last run's value
+  sc <- FindClusters(sc, resolution = seq(0.20, 0.05, -0.05), graph.name = "Harmony") # reverse order, seurat_clusters takes last run's value
+  sc <- RunUMAP(sc, reduction = "harmony", dims = 1:40)
+  } else {
+  sc <- FindNeighbors(sc, dims = 1:30)
+  sc <- FindClusters(sc, resolution = seq(0.20, 0.05, -0.05)) # reverse order, seurat_clusters takes last run's value
+  sc <- FindClusters(sc, resolution = seq(1.5, 0.25, -0.25)) # reverse order, seurat_clusters takes last run's value
+  sc <- RunUMAP(sc, dims = 1:30)
+}
+
+```
+
+Non-linear dimensionality reduction with UMAP
+
+```{r plot_rdim}
+DimPlot(sc, group.by = "SCT_snn_res.0.5") + ggmin::theme_powerpoint()
+ggsave(paste0(plots_path, "UMAP.color.by.orig.ident.pdf"), width = 8, height = 7)
+```
+
+
+# Cell-cycle stage classification
+
+Score G1, G2/M and S signatures in each cell.
+
+Classify phase based on that score.
+
+```{r CC_regression, eval=TRUE}
+if(params$cell.source == "human") {
+  s.genes <- cc.genes.updated.2019$s.genes
+  g2m.genes <- cc.genes.updated.2019$g2m.genes
+} else {
+  s.genes <- firstup(cc.genes.updated.2019$s.genes)
+  g2m.genes <- firstup(cc.genes.updated.2019$g2m.genes)
+}
+sc <- CellCycleScoring(sc, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)  
+grouping <- "Phase"; DimPlot(sc, reduction = "umap", group.by =  grouping) + ggmin::theme_powerpoint()
+
+kable(table(sc$Phase, sc[[params$resDEG]][[1]]), caption="Cell cycle stage classification per 
+cluster") %>%   kable_styling() %>%   scroll_box(width = "100%", height = "200px")
+```
+
+# Molecular Signatures scoring
+
+Compute enrichment for molecular signatures using method from Tirosh et al, Science (2016)    
+
+```{r mol_sig_score, fig.height=11}
+msig <- scan(paste0(cremwd, "/reference_data/gene_sets/lung.matur.differ.MSig.txt"), what="", sep="\n") # Read in the data
+msig <- sapply(msig, function(k) gsub(",$", "", k))
+msig <- strsplit(msig, ",[[:space:]]+")  # Separate elements by a comma and one or more whitepace
+names(msig) <- sapply(msig, `[[`, 1)  # subset the first vector element and set it as the list element name
+msig <- lapply(msig, `[`, -1) # Remove the first vector element from each list element        
+sc.markers.wilcox.res <- readRDS(paste0(cremwd, "project_workspace/19_09_10_darrell_habermann/calculations/analysis/habermann//rds/sc.markers.wilcox.celltype.Rds"))
+sc.markers.wilcox.res[[2]]$cluster <- paste0("Hb_", sc.markers.wilcox.res[[2]]$cluster)  # habermann et al msig
+
+msig2 <- split(sc.markers.wilcox.res[[2]]$gene, sc.markers.wilcox.res[[2]]$cluster)
+
+msig3 <- as.list(readxl::read_excel(paste0(cremwd, "/reference_data/gene_sets/andrea.msig.xlsx"), sheet=1))
+msig3 <- lapply(msig3, function(x) x[!is.na(x)])
+
+msig5 <- as.list(readxl::read_excel(paste0(cremwd, "/reference_data/gene_sets/andrea_ER_Genesets.xlsx"), sheet=1))
+msig5 <- lapply(msig5, function(x) x[!is.na(x)])
+msig5 <- msig5[-1]
+names(msig5) <- paste0('ER_', names(msig5))
+
+msig6 <- as.list(readxl::read_excel(paste0(cremwd, "/reference_data/gene_sets/EarlyFibro_minusCC.xlsx"), sheet=1))
+msig6 <- lapply(msig6, function(x) x[!is.na(x)])
+
+
+msig <- c(msig, msig2,msig3)
+
+genes <- c('COL1A1','ACTA2','FN1','CTHRC1','CTGF')
+msig[[51]] <- genes
+names(msig)[51] <- "Fibrotic_markers"
+
+sc.markers.res <- as.list(readxl::read_excel(paste0(cremwd, "project_workspace/23_09_11_andrea/calculations/analysis/combined/TopMarkers_celltype_level3.xls")))
+msig4 <- split(sc.markers.res$feature, sc.markers.res$group)
+
+#msig <- c(msig, msig4,msig5,msig6)
+
+sc.markers.wilcox.res <- readRDS(paste0(cremwd, "project_workspace/24_03_14_andrea/calculations/analysis/combined_without_D63Tplus/rds/sc.markers.mas.subset.01.SCT_snn_res.0.5.Rds"))
+sc.markers.wilcox.res[[2]]$cluster <- paste0("Top50_Cluster_", sc.markers.wilcox.res[[2]]$cluster)
+msig7 <- split(sc.markers.wilcox.res[[2]]$gene, sc.markers.wilcox.res[[2]]$cluster)
+
+msig7[['Top50_Cluster_4_subset']] <- c('H19','ACTG1','SFRP2','SULT1E1','GABPB1-AS1','AC024940.2','NAP1L1','CCND2','DES','BCL11A','MT-TP','IGF2BP2','SNAI2','SLITRK6','MAGED2','UNC5C','NRP2','BCAT1','NKAIN4','PCDH18','MME','TNFRSF19','CTSC','GNAO1','PLAC9','L1TD1','SCN7A','FN1','HIPK2')
+
+
+names(msig) <- sub("\\+", "pos", names(msig))
+names(msig) <- sub("-", "neg", names(msig))
+names(msig) <- make.names(names(msig))
+if(params$cell.source == "mouse") {
+    msig <- lapply(msig, firstup)
+}
+
+
+
+sc <- AddModuleScore(sc, features = msig, name = names(msig), search = T)
+sc <- AddMetaData(sc, sc[[paste0(names(msig), 1:length(names(msig)))]], col.name = names(msig))
+for(i in paste0(names(msig), 1:length(names(msig)))) {
+  sc[[i]] <- NULL
+}
+```
+
+# UMAP clusters
+
+```{r facetted_louvain_clusters_UMAP, fig.height=6}
+if(params$harmonize) {
+  grouping <- "Harmony_res.0.1";  p1 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "Harmony_res.0.15"; p2 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "Harmony_res.0.2";  p3 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "Harmony_res.0.25"; p4 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "Harmony_res.0.5";  p5 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "Harmony_res.0.75"; p6 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  } else {
+  grouping <- "SCT_snn_res.0.1";  p1 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "SCT_snn_res.0.15"; p2 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "SCT_snn_res.0.2";  p3 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "SCT_snn_res.0.25"; p4 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "SCT_snn_res.0.5";  p5 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+  grouping <- "SCT_snn_res.0.75"; p6 <- DimPlot(sc, group.by = grouping, label = T) + labs(title = grouping)
+}
+p <- p1 + p2 + p3 + p4 + p5 + p6
+p <- p & ggmin::theme_powerpoint() & NoAxes() & NoLegend()
+p
+ggsave(paste0(plots_path, "UMAP.clust.pdf"), width = 10, height = 7)
+```
+
+# UMAP pre-selected features
+
+```{r echo=FALSE}
+# 4 columns, 9 width, height per line == 9 / 4 == 2.25
+x <- interesting_feats <- c("nFeature_RNA", "nCount_RNA", "percent.mito", names(msig), interesting_genes)
+len <- (length(unique(x))/4)*2.25
+```
+
+```{r pre_selected_marker_genes_UMAP,  fig.height=len}
+interesting_feats <- c("nFeature_RNA", "nCount_RNA", "percent.mito", names(msig), interesting_genes)
+p <- FeaturePlot(sc, features = interesting_feats, cols = c("#f0f0f0", brewer.pal(9,"OrRd")))
+p <- p & ggmin::theme_powerpoint() & NoAxes() & NoLegend()
+p
+ggsave(paste0(plots_path, "UMAP.preselected.feats.pdf"),limitsize = FALSE)
+```
+
+
+# Differential expression
+
+Differential expression model: MAST, Finak et al.:
+https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0844-5
+
+For a recent comparison on the performance of different methods for single-cell differential expression, see:
+https://www.nature.com/articles/nmeth.4612
+
+
+```{r use_seurat, eval=F, fig.height=15}
+fmas <- function(sc, res) {
+    Idents(sc) <- res
+    file_out <- paste0(calculations_path, "DEG.SCT_snn_res.0.5.subset.0.1.3.4.8.9.10.13.xlsx")
+    seurat.markers <- FindAllMarkers(sc, test.use = "MAST", only.pos = TRUE, min.pct = 0.1, verbose = F)
+    seurat.markers.summary <- as.data.frame(seurat.markers %>% group_by(cluster) %>% dplyr::filter(p_val_adj < 0.05) %>% top_n(50, abs(avg_log2FC)))
+    openxlsx::write.xlsx(seurat.markers, file_out, zoom = 100, asTable = TRUE, tableStyle = "none", rowNames = F)
+    return(list(all = seurat.markers, top = seurat.markers.summary))
+}
+resDEG <- 'SCT_snn_res.0.5'
+sc.markers.mas.res <- fmas(sc.2, resDEG)
+
+saveRDS(sc.markers.mas.res, paste0(rds_path, "sc.markers.mas.subset.01.", resDEG, ".Rds"))
+```
+
+Table of top 20 DEG per cluster
+
+
+```{r, eval=F}
+sc.markers.mas.res[[2]] %>% dplyr::mutate(cluster = cell_spec(
+    cluster, color = "white", bold = T,
+    background = spec_color(as.numeric(factor(cluster)), end = 0.9, direction = -1)
+  )) %>% kable(escape = F, caption=paste0("Top DEG for clusters at ", resDEG )) %>% kable_styling() %>% scroll_box(width = "100%", height = "600px")
+```
+
+# Heatmap of DEG
+
+Heatmap of top 20 DEG per cluster
+
+
+```{r heatmap_DEG, eval = F, fig.height=15}
+Idents(sc.2) <- resDEG
+# switch to RNA normalized for heatmap visualization
+DefaultAssay(sc.2) <- "RNA"
+sc.2 <- NormalizeData(sc.2)
+all.genes <- rownames(sc.2)
+sc.2 <- ScaleData(sc.2, features = all.genes, vars.to.regress="percent.mito", verbose = F) # default: only scales var.genes, which misses some in heatmap
+
+g <- DoHeatmap(sc.2, features = sc.markers.mas.res[[2]]$gene) + scale_fill_gradientn(colors = c("blue", "white", "red"))
+print(g)
+ggsave(paste0(plots_path, "heatmap.Top50.359.vs.364.pdf"), width = 10, height = 20, limitsize = FALSE)# only need to use print if you aren't in a top-level statement (e.g. in a function, in an if/else block, etc.)
+DefaultAssay(sc) <- "SCT"
+
+```
+
+```{r save_object}
+saveRDS(sc, paste0(rds_path, "sc.Rds"))
+```
+
+# UMAP of DEG
+
+
+```{r echo=FALSE, eval=FALSE}
+# 4 columns, 9 width, height per line == 9 / 4 == 2.25
+x <- sc.markers.mas.res[[1]] %>% group_by(cluster) %>% dplyr::filter(p_val_adj < 0.05) %>% top_n(4, avg_log2FC) %>% pull(gene)
+len2 <- (length(unique(x))/4)*2.25
+```
+
+```{r feat_DEG_UMAP, error = TRUE, eval=FALSE}
+# when allowing duplicates gives error
+p <- FeaturePlot(sc, features = unique(x), cols = c("#f0f0f0", brewer.pal(9,"OrRd")) )        
+p <- p & ggmin::theme_powerpoint() & NoAxes() & NoLegend()
+p
+ggsave(paste0(plots_path, "UMAP.DEG.pdf"))
+```
+
+```{r export_spring, eval=T}
+ #sc_harmony <- readRDS("/restricted/projectnb/crem-bioinfo/project_workspace/20_09_25_andrea/calculations/analysis/combined_harmony/rds/sc.Rds")
+ #harmony_clus <- sc_harmony[[]][grep("Harmony", names(sc_harmony[[]]))]
+ #sc <- AddMetaData(sc, harmony_clus)
+ #meta.subset <- sc[[c("orig.ident", "Phase", grep("^SCT", colnames(sc[[]]), value = T), grep("^Harmony", colnames(sc[[]]), value = T) )]]
+
+export.data <- GetAssayData(sc, slot = "counts")  # for SCT, counts are corrected for depth   
+export.genes <- rownames(sc)
+write.table(as.matrix(export.data), gzfile(paste0(master_path, "/subset.spring.data.tsv.gz")), sep = "\t", quote = F, col.names = T, row.names = T )
+write.table(export.genes, paste0(master_path, "/subset.spring.genes.tsv"), sep = "\t", quote = F, col.names = F, row.names = F )
+if(params$harmonize) {
+  meta.subset <- sc[[c("orig.ident","annotation","sample","Phase", grep("^Harmony", colnames(sc[[]]), value = T) )]]
+  } else {
+  meta.subset <- sc[[c("orig.ident", "annotation","sample","Phase", grep("^SCT", colnames(sc[[]]), value = T) )]]   
+}
+groupings <- t(meta.subset) # select metadata
+meta.continuous <- sc[[names(msig)]]
+custom.color.tracks <- t(meta.continuous)
+write.table(custom.color.tracks, paste0(master_path, "/subset.spring.custom.color.tracks.csv"), sep = ",", quote = F, col.names = F, row.names = T )
+write.table(groupings, paste0(master_path, "/subset.spring.groupings.csv"), sep = ",", quote = F, col.names = F, row.names = T )
+```
+
+```{r featureplot, eval=FALSE}
+genes <- c("Top50_Cluster_1","Top50_Cluster_0","Top50_Cluster_3","Top50_Cluster_4")
+data <- FetchData(sc, vars = c("UMAP_1", "UMAP_2", genes))
+
+global_min <- min(data[, genes])
+global_max <- max(data[, genes])
+
+#color_scale <- colorRampPalette(brewer.pal(9, "OrRd"))(100)
+color_scale <- c("#4575B4","#74ADD1","#ABD9E9","#E0F3F8","#FFFFBF","#FEE090","#FDAE61","#F46D43","#D73027")[c(1,1:9,9)]
+plots <- lapply(genes, function(gene) {
+     ggplot(data, aes_string(x = "UMAP_1", y = "UMAP_2", color = gene)) +
+         geom_point(size = 0.5) +
+         scale_color_gradientn(colors = color_scale, limits = c(global_min, global_max)) +
+         theme_void() +
+         ggtitle(gene)
+})
+wrap_plots(plots)
+
+```
+
+
+```{r, eval=FALSE}
+library(Azimuth)
+library(glmGamPoi)
+sc_annot <- JoinLayers(sc, assay = "RNA")
+sc_annot <- RunAzimuth(sc_annot, reference = "lungref")
+saveRDS(sc_annot, paste0("~/tmp.lauren.sc_annot.Rds"))
+table(sc_annot[[]]$predicted.ann_finest_level, sc_annot[[]]$annotation)
+  #                              iAT1  iBC TGFB 2 Proliferating 1 TGFB 1 iAT2 Proliferating 2 TGFB and iAT1
+  # Adventitial fibroblasts         1    1     15               0     17    1               0             0
+  # Alveolar fibroblasts           85   12    168               5    512   71               0             3
+  # AT1                          3053  220    233             388     43   85               0            12
+  # AT2                            44   14    299              27     15  919               0             1
+  # AT2 proliferating              20   19     11            1022      7   67               5             0
+  # Basal resting                  17 1841     39              13     61  168               0             2
+  # CD4 T cells                     0   18      0               0      0    0               0             0
+  # CD8 T cells                     2   20      7               1      8    3               0             0
+  # Club (nasal)                    0  236      0               0      0    0               0             0
+  # Club (non-nasal)                0   33      0               0      0    0               0             0
+  # DC2                             0    0      0               0      0    3               0             0
+  # Deuterosomal                    1    8      0               0      0    0               0             0
+  # EC venous systemic              0    0      0               0      2    0               0             0
+  # Goblet (nasal)                  0   86      0               0      0    0               0             0
+  # Ionocyte                       88  413    424             115    421  672               1           166
+  # Lymphatic EC differentiating    6    0      6               1      1    0               0             0
+  # Lymphatic EC mature             1    0      0               0      0    0               0             0
+  # Monocyte-derived Mφ             3    0      6              13     21    2               0             0
+  # Multiciliated (non-nasal)       0   69      1               0      0    1               0             0
+  # Myofibroblasts                  0   11      0               1      0    0               0             0
+  # Neuroendocrine                  0    0      0               0      0    0               0            36
+  # Pericytes                      24    2     20               3     14   15               0             0
+  # Smooth muscle                   5    0    258               1     31    3               0             0
+  # Suprabasal                      7  906      9             758      1   31             734             0
+  # Transitional Club-AT2         245  141     44              11      6    0               0             2
+  # Tuft                            0   70      0              72      4   27              12             0
+table(sc_annot[[]]$predicted.ann_level_3, sc_annot[[]]$annotation)
+  #                       iAT1  iBC TGFB 2 Proliferating 1 TGFB 1 iAT2 Proliferating 2 TGFB and iAT1
+  # AT1                   3027  190    219             381     32   80               0            12
+  # AT2                     63   31    309            1027     18  989               4             1
+  # Basal                   24 2777     42             796     56  188             735             2
+  # EC venous                1    0      0               0      0    0               0             0
+  # Fibroblasts            142   17    382              12    615  117               0             4
+  # Macrophages              3    0      1              12      4    1               0             0
+  # Multiciliated lineage    1   69      1               0      0    1               0             0
+  # Myofibroblasts           0   10      0               0      0    0               0             0
+  # None                     2    0    143               0     14    1               0             0
+  # Rare                    88  483    390             190    395  679              13           201
+  # Secretory              245  493     44              12      6    1               0             2
+  # T cell lineage           6   50      9               1     24   11               0             0
+
+grouping <- "predicted.ann_level_3"
+p1 <- DimPlot(sc_annot, group.by = grouping, label = T) + labs(title = grouping)
+p1 <- p1 & ggmin::theme_powerpoint() & NoAxes() & NoLegend()
+ggsave(paste0( "~/lauren.UMAP.Azimuth.pdf"), p1, width = 10, height = 10)
+
+grouping <- "annotation"
+p2 <- DimPlot(sc_annot, group.by = grouping, label = T) + labs(title = grouping)
+p2 <- p2 & ggmin::theme_powerpoint() & NoAxes() & NoLegend()
+ggsave(paste0( "~/lauren.UMAP.annot_supervised.pdf"), p2, width = 10, height = 10)
+
+p <- p1 + p2
+ggsave(paste0("~/lauren.UMAP.both_annot.pdf"), p, width = 20, height = 10)
+```
+
