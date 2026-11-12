@@ -87,13 +87,16 @@ cellranger-atac ──> 03/01_build_archr_project.R    │            02_markers
 | cellranger mkfastq / multi (scRNA) | 9.0.1 |
 | cellranger-atac | 2.1.0 |
 
-**Downstream analysis and figures** (`02`–`06`)
+**Downstream analysis and figures** (`02`–`06`; marker/GSEA versions from `02_scRNA_analysis/sessionInfo_markers_GSEA.txt`)
 
 | Tool | Version |
 |---|---|
-| Seurat | 5.0.2 *(lib.loc in original figure scripts; to confirm)* |
+| Seurat / SeuratObject (R 4.4.3) | 5.5.1 / 5.4.0 |
+| MAST | 1.32.0 |
+| fgsea | 1.32.4 |
+| msigdbr | 26.1.0 |
 | ArchR | 1.0.3 |
-| MAST, fgsea, msigdbr, pheatmap, ggseqlogo | *TBD*: printed by `sessionInfo()` at the end of each figure script |
+| pheatmap, ggseqlogo | *TBD*: printed by `sessionInfo()` at the end of each figure script |
 | pycisTopic, SCENIC+ | *TBD* |
 | scTOP | 2.0.3 |
 | ShinyCell | *TBD* |
