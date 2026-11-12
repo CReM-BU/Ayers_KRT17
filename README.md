@@ -67,17 +67,39 @@ cellranger-atac ──> 03/01_build_archr_project.R    │            02_markers
 
 ## Software
 
+**scRNA-seq preprocessing** (`01_scRNA_preprocessing`; from `sessionInfo()`, BU SCC, AlmaLinux 8.10)
+
+| Tool | Version |
+|---|---|
+| R | 4.4.3 |
+| Seurat / SeuratObject | 5.5.1 / 5.4.0 |
+| sctransform | 0.4.3 |
+| glmGamPoi | 1.18.0 |
+| presto | 1.0.0 |
+| tidyverse / dplyr / data.table | 2.0.0 / 1.2.1 / 1.17.8 |
+| clustree | 0.5.1 |
+
+**Alignment**
+
 | Tool | Version |
 |---|---|
 | cellranger mkref (scRNA reference) | 3.0.2 |
-| cellranger multi (scRNA) | 9.0.1 |
+| cellranger mkfastq / multi (scRNA) | 9.0.1 |
 | cellranger-atac | 2.1.0 |
-| R | 4.4.0 |
-| Seurat | 5.0.2 |
+
+**Downstream analysis and figures** (`02`–`06`; marker/GSEA versions from `02_scRNA_analysis/sessionInfo_markers_GSEA.txt`)
+
+| Tool | Version |
+|---|---|
+| Seurat / SeuratObject (R 4.4.3) | 5.5.1 / 5.4.0 |
+| MAST | 1.32.0 |
+| fgsea | 1.32.4 |
+| msigdbr | 26.1.0 |
 | ArchR | 1.0.3 |
-| MAST, fgsea, msigdbr, pheatmap | see `sessionInfo()` at end of each figure script |
+| pheatmap, ggseqlogo | *TBD*: printed by `sessionInfo()` at the end of each figure script |
 | pycisTopic, SCENIC+ | *TBD* |
 | scTOP | 2.0.3 |
+| ShinyCell | *TBD* |
 
 ## Status
 
