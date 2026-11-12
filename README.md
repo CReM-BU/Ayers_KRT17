@@ -30,7 +30,7 @@ paths from [`config.R`](config.R).
 
 ```
 00_alignment/              FASTQ generation and alignment (BU CReM bioinformatics core, SCC)
-  scRNA/                   cellranger 9.0.1 mkfastq + cellranger multi (OCM) config
+  scRNA/                   reference build, cellranger 9.0.1 mkfastq + multi (OCM)
   scATAC/                  cellranger-atac 2.1.0 mkfastq + count
 01_scRNA_preprocessing/    per-sample QC + merged Seurat object (Rmd)
 02_scRNA_analysis/
@@ -68,7 +68,8 @@ cellranger-atac ──> 03/01_build_archr_project.R    │            02_markers
 
 | Tool | Version |
 |---|---|
-| cellranger (scRNA) | 9.0.1 |
+| cellranger mkref (scRNA reference) | 3.0.2 |
+| cellranger multi (scRNA) | 9.0.1 |
 | cellranger-atac | 2.1.0 |
 | R | 4.4.0 |
 | Seurat | 5.0.2 |

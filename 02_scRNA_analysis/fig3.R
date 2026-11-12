@@ -73,9 +73,10 @@ dev.off()
 # ---- Fig 3D: GFP and KRT17 transcript expression -----------------------------------
 # NEW: the published panel was exported from the Shiny app
 # (https://crem-bu.shinyapps.io/scRNAseq-TGFB-treatment-iAT2s/). This script
-# reproduces it from the same object. Confirm the GFP feature name below.
-gfp_feature <- grep("GFP", rownames(rna), value = TRUE, ignore.case = TRUE)
-message("GFP feature(s) found: ", paste(gfp_feature, collapse = ", "))
+# reproduces it from the same object. KRT17-GFP reads map to the EGFP_EXTRA
+# transcript added in 00_alignment/scRNA/00_mkref.sh.
+gfp_feature <- grep("EGFP", rownames(rna), value = TRUE)
+stopifnot(length(gfp_feature) == 1)
 pdf(plot_path("fig3D_umap_GFP_KRT17.pdf"), width = 10, height = 5)
 print(
   FeaturePlot(rna, features = c(gfp_feature[1], "KRT17"), order = TRUE, pt.size = 0.8) &

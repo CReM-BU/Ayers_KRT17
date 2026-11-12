@@ -4,24 +4,19 @@
 #
 # Renders the per-sample and combined Seurat pipelines.
 #
-# RECONSTRUCTED from the Rmd params blocks -- the exact render commands used
-# for the paper were not in the repo. CONFIRM percent.mito for each sample
-# (methods state 15-35%; the Rmd default is 25).
+# Reconstructed from the Rmd params blocks (the render commands themselves were
+# not saved). Mitochondrial cut-off: cells with >= 25% mito reads are removed
+# in 10x.Rmd (per sample). The combined Rmd does not filter on percent.mito.
 # =============================================================================
 set -euo pipefail
 cd "$(dirname "$0")"
 
 # ---- Per-sample QC / processing --------------------------------------------------
-declare -A PERCENT_MITO=(          # TODO: confirm values used for each sample
-  [KD_AL_OCM_1]=25
-  [KD_AL_OCM_2]=25
-  [KD_AL_OCM_3]=25
-  [KD_AL_OCM_4]=25
-)
+PERCENT_MITO=25
 for pref in KD_AL_OCM_1 KD_AL_OCM_2 KD_AL_OCM_3 KD_AL_OCM_4; do
   Rscript -e "rmarkdown::render('10x.Rmd', output_file = '${pref}.html',
     params = list(prefix = '${pref}', resDEG = 'SCT_snn_res.0.25',
-                  percent.mito = ${PERCENT_MITO[$pref]}, cell.source = 'human'))"
+                  percent.mito = ${PERCENT_MITO}, cell.source = 'human'))"
 done
 
 # ---- Combined object ---------------------------------------------------------------

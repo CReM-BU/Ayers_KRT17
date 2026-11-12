@@ -1,0 +1,34 @@
+#!/bin/bash -l
+# scRNA-seq: align/count the 4 OCM-multiplexed samples (cellranger 9.0.1 multi)
+# using 02_cellranger_multi_config.csv. Output per_sample_outs/KD_AL_OCM_1..4
+# is read by 01_scRNA_preprocessing/10x.Rmd.
+# Note: as run, the --csv line has no trailing "\", so --localcores/--localmem
+# were not passed and cellranger used its defaults (does not affect results).
+
+# Set SCC project
+#$ -P crem-bioinfo
+
+# Specify hard time limit for the job.
+#$ -l h_rt=24:00:00
+
+# Give job name
+#$ -N s1
+
+# Request 8 cores on a machine with at least 128 GB of RAM
+#$ -pe omp 16
+#$ -l mem_per_core=8G
+
+# Send an email at the end
+#$ -m ea
+
+module load bcl2fastq/2.20
+module load cellranger/9.0.1
+date
+cd /restricted/projectnb/crem-bioinfo/project_workspace/25_06_24_lauren/RNA/calculations/cellranger_multi
+time cellranger multi \
+  --id=AL_KD_OCM_1 \
+  --csv=/restricted/projectnb/crem-bioinfo/project_code/25_06_24_lauren/RNA/qc_and_alignment/multi_config_S1.csv
+  --localcores=8 \
+  --localmem=128
+date
+  
