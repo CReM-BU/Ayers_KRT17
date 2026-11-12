@@ -1,0 +1,27 @@
+# Data and large outputs -- keep out of git
+*.rds
+*.Rds
+*.RDS
+*.h5ad
+*.h5mu
+*.h5
+*.mtx
+*.feather
+*.pkl
+*.arrow
+*.fa
+*.fasta
+*.bed
+*.tsv.gz
+plots/
+tables/
+ArrowFiles/
+*_cache/
+*.html
+
+# OS / editor
+.DS_Store
+.Rhistory
+.RData
+.Rproj.user/
+__pycache__/

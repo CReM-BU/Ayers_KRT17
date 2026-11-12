@@ -20,6 +20,18 @@ params:
   sample.names: !r c("KD_AL_OCM_1","KD_AL_OCM_2","KD_AL_OCM_3","KD_AL_OCM_4")
 ---
 
+<!--
+01_scRNA_preprocessing/10x.combined.Rmd  (KRT17 paper)
+Merges the four per-sample objects (no Harmony integration), SCTransform
+regressing percent.mito, PCA (30 PCs), Louvain clustering at resolutions
+0.05-1.5, UMAP, cell-cycle scoring, and gene-set module scores including the
+Habermann et al. 20-gene sets (Hb_* columns used in Fig 3F / S3C).
+Output: combined/rds/sc.Rds (shared as RNA.rds). NOTE: the `sample` and
+`annotation` columns used later are not created in this Rmd.
+This is the CReM bioinformatics core template; chunks with eval=FALSE were not run.
+-->
+
+
 
 ```{r setup, include=FALSE, cache=FALSE}
 library(future)
