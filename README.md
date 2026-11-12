@@ -43,7 +43,7 @@ paths from [`config.R`](config.R).
   fig4.R, figS4.R          Figure 4 and S4 panels
 04_scenicplus/             eRegulon analysis (pycisTopic + custom cisTarget db + SCENIC+)
 05_scTOP/                  scTOP projections (pending)
-06_shiny_app/              ShinyCell app settings (source of Fig 3D, S3E, S3F exports)
+06_shiny_app/              ShinyCell app build (Fig 3D, S3E, S3F were exported from it)
 config.R                   paths, colours, themes shared by all R scripts
 ```
 

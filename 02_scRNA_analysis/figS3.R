@@ -7,8 +7,8 @@
 # S3B    figS3B_umap_res0.25_subclustered.pdf
 # S3C    figS3C_vln_habermann_genesets.pdf
 # S3D    figS3D_heatmap_top20_DEG.pdf               page 1 = left, page 2 = right
-# S3E    figS3E_umap_ASCL1_CHGA.pdf                 NEW script (not in original repo)
-# S3F    figS3F_umap_SOX2_SOX4_SOX6.pdf             NEW script (not in original repo)
+# S3E    figS3E_umap_ASCL1_CHGA.pdf                 NEW script; published panel from Shiny app
+# S3F    figS3F_umap_SOX2_SOX4_SOX6.pdf             NEW script; published panel from Shiny app
 # S3G    figS3G_vln_NKX2-1.pdf
 # S3H    —                                          scTOP, see 05_scTOP/
 #
@@ -90,13 +90,14 @@ rm(rna_hm)
 
 # ---- Fig S3E: PNEC markers ASCL1 and CHGA (NEW) ------------------------------------
 pdf(plot_path("figS3E_umap_ASCL1_CHGA.pdf"), width = 10, height = 5)
-print(FeaturePlot(rna, features = c("ASCL1", "CHGA"), order = TRUE) & theme_umap())
+print(FeaturePlot(rna, features = c("ASCL1", "CHGA"), order = TRUE, cols = SHINY_EXPR_COLS) & theme_umap())
 dev.off()
 
 
 # ---- Fig S3F: SOX2, SOX4, SOX6 (NEW) -----------------------------------------------
 pdf(plot_path("figS3F_umap_SOX2_SOX4_SOX6.pdf"), width = 15, height = 5)
-print(FeaturePlot(rna, features = c("SOX2", "SOX4", "SOX6"), order = TRUE, ncol = 3) & theme_umap())
+print(FeaturePlot(rna, features = c("SOX2", "SOX4", "SOX6"), order = TRUE, ncol = 3,
+                  cols = SHINY_EXPR_COLS) & theme_umap())
 dev.off()
 
 

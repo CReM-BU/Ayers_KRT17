@@ -33,8 +33,8 @@ ARCHR_PROJECT     <- file.path(DATA_DIR, "LJA_250624_ATAC")     # ArchR project 
 for (d in c(PLOT_DIR, TABLE_DIR)) dir.create(d, recursive = TRUE, showWarnings = FALSE)
 
 # ---- Shared plotting constants ------------------------------------------------
-# Cell-type colours. Order matches levels of `subcluster_names` set in
-# 01_annotate_clusters.R; colours are named so order no longer matters.
+# Cell-type and sample colours -- identical to the ShinyCell app config
+# (sc1conf.rds, Cluster_annotation and orig.ident).
 CLUSTER_COLS <- c(
   "iAT1"                     = "brown3",
   "SOX high TGFB-treated"    = "brown1",
@@ -56,6 +56,11 @@ SAMPLE_COLS <- c(
   "iBCs PneumacultEx" = "#208A42",
   "iAT2s TGFB+DCI"    = "#89288F"
 )
+
+# Gene-expression colour scale used by the ShinyCell app ("White-Red"); used for
+# the feature plots that were originally exported from the app (Fig 3D, S3E, S3F)
+SHINY_EXPR_COLS <- c("grey85", "#FFF7EC", "#FEE8C8", "#FDD49E", "#FDBB84",
+                     "#FC8D59", "#EF6548", "#D7301F", "#B30000", "#7F0000")
 
 # UMAP theme without axis text/ticks (used for all UMAP panels)
 theme_umap <- function() {

@@ -7,7 +7,7 @@
 # 3B     fig3B_umap_sample.pdf
 # 3C     fig3C_umap_celltype.pdf
 # 3D     fig3D_umap_GFP_KRT17.pdf                     NEW script; published panel
-#                                                     came from the Shiny app
+#                                                     exported from the Shiny app (06_shiny_app/)
 # 3E     fig3E_dotplot_markers.pdf
 # 3F     fig3F_vln_habermann_AT2_KRT17.pdf
 # 3G,3H  —                                            scTOP, see 05_scTOP/
@@ -74,12 +74,12 @@ dev.off()
 # NEW: the published panel was exported from the Shiny app
 # (https://crem-bu.shinyapps.io/scRNAseq-TGFB-treatment-iAT2s/). This script
 # reproduces it from the same object. KRT17-GFP reads map to the EGFP_EXTRA
-# transcript added in 00_alignment/scRNA/00_mkref.sh.
-gfp_feature <- grep("EGFP", rownames(rna), value = TRUE)
-stopifnot(length(gfp_feature) == 1)
+# transcript added in 00_alignment/scRNA/00_mkref.sh ("EGFP-EXTRA" in Seurat).
+# Colour scale = ShinyCell "White-Red"; high-expressing cells plotted on top.
 pdf(plot_path("fig3D_umap_GFP_KRT17.pdf"), width = 10, height = 5)
 print(
-  FeaturePlot(rna, features = c(gfp_feature[1], "KRT17"), order = TRUE, pt.size = 0.8) &
+  FeaturePlot(rna, features = c("EGFP-EXTRA", "KRT17"), order = TRUE, pt.size = 0.8,
+              cols = SHINY_EXPR_COLS) &
     theme_umap()
 )
 dev.off()
