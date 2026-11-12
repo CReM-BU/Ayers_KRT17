@@ -30,6 +30,13 @@ RNA_RAW_RDS       <- file.path(DATA_DIR, "RNA.rds")             # = combined/rds
 RNA_ANNOTATED_RDS <- file.path(DATA_DIR, "rna_annotated.rds")   # output of 02_scRNA_analysis/01_annotate_clusters.R
 ARCHR_PROJECT     <- file.path(DATA_DIR, "LJA_250624_ATAC")     # ArchR project directory
 
+# Habermann et al. 2020 (Sci Adv) scRNA-seq object, CReM re-analysis behind
+# https://crem-bu.shinyapps.io/19_09_10_darrell_habermann/  (used for Fig 3L)
+HABERMANN_RDS <- Sys.getenv(
+  "KRT17_HABERMANN_RDS",
+  "/restricted/projectnb/crem-bioinfo/project_workspace/19_09_10_darrell_habermann/calculations/analysis/habermann/rds/sc.Rds"
+)
+
 for (d in c(PLOT_DIR, TABLE_DIR)) dir.create(d, recursive = TRUE, showWarnings = FALSE)
 
 # ---- Shared plotting constants ------------------------------------------------

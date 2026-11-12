@@ -14,8 +14,8 @@
 # 3I     fig3I_gsea_hallmark_KRT17_vs_iAT2.pdf (+ .tsv in TABLE_DIR)
 # 3J     fig3J_heatmap_top20_KRT17_markers.pdf
 # 3K     fig3K_vln_IL32.pdf
-# 3L     —                                            MISSING (Habermann et al. data;
-#                                                     published panel from Shiny app)
+# 3L     fig3L_vln_IL32_habermann.pdf                 NEW script; published panel
+#                                                     exported from the Habermann Shiny app
 #
 # Inputs: RNA_ANNOTATED_RDS, outputs of 02_markers_and_DEG.R
 # Run from repo root:  Rscript 02_scRNA_analysis/fig3.R
@@ -204,8 +204,30 @@ print(VlnPlot(rna, features = "IL32", pt.size = 0, cols = CLUSTER_COLS))
 dev.off()
 
 
-# ---- Fig 3L: IL32 in Habermann et al. epithelium -- MISSING --------------------------
-# Published panel was exported from https://crem-bu.shinyapps.io/19_09_10_darrell_habermann/
-# TODO: add script that plots IL32 from the Habermann et al. Seurat object.
+# ---- Fig 3L: IL32 in Habermann et al. epithelial cell types -----------------------
+# Published panel was exported from the ShinyCell app
+#   https://crem-bu.shinyapps.io/19_09_10_darrell_habermann/
+# (violin plot, gene = IL32, grouped by cell type, subset to the epithelial
+# cell types below). This reproduces it from the object behind that app.
+HB_CELLTYPE_COL <- "celltype"   # TODO: confirm metadata column used in the app
+HB_EPITHELIAL <- c("AT1", "AT2", "Basal", "Ciliated", "Differentiating Ciliated",
+                   "KRT5-/KRT17+", "MUC5AC+ High", "MUC5B+", "SCGB3A2+",
+                   "SCGB3A2+ SCGB1A1+", "Transitional AT2")
+
+hb <- readRDS(HABERMANN_RDS)
+DefaultAssay(hb) <- if ("SCT" %in% Assays(hb)) "SCT" else "RNA"
+missing_types <- setdiff(HB_EPITHELIAL, unique(hb[[HB_CELLTYPE_COL]][, 1]))
+if (length(missing_types)) warning("Cell types not found in object: ", paste(missing_types, collapse = ", "))
+
+hb <- hb[, hb[[HB_CELLTYPE_COL]][, 1] %in% HB_EPITHELIAL]
+Idents(hb) <- factor(hb[[HB_CELLTYPE_COL]][, 1], levels = HB_EPITHELIAL)
+
+pdf(plot_path("fig3L_vln_IL32_habermann.pdf"), width = 6, height = 5)
+print(
+  VlnPlot(hb, features = "IL32", pt.size = 0) +
+    ggtitle("Habermann et al., Science Advances, 2020") + xlab("") + NoLegend()
+)
+dev.off()
+rm(hb)
 
 sessionInfo()

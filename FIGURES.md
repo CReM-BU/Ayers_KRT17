@@ -25,7 +25,7 @@ scripts listed here make an equivalent plot from the same object.
 | 3I | Hallmark GSEA, KRT5-/KRT17+ vs iAT2 | `02_markers_and_DEG.R` → `fig3.R` | `fig3I_gsea_hallmark_KRT17_vs_iAT2.pdf` | ✅ |
 | 3J | Top 20 KRT5-/KRT17+ markers across clusters | `02_markers_and_DEG.R` → `fig3.R` | `fig3J_heatmap_top20_KRT17_markers.pdf` | ✅ |
 | 3K | IL32 across clusters | `02_scRNA_analysis/fig3.R` | `fig3K_vln_IL32.pdf` | ✅ |
-| 3L | IL32 in Habermann et al. epithelium | — | — | ❌ (Habermann Shiny app) |
+| 3L | IL32 in Habermann et al. epithelial cell types | `02_scRNA_analysis/fig3.R` | `fig3L_vln_IL32_habermann.pdf` | 🆕 (Habermann Shiny app) |
 
 ## Figure 4 — scATAC-seq
 
