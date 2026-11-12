@@ -10,11 +10,6 @@ panel-by-panel map of script → output file.
 
 Interactive scRNA-seq browser: https://crem-bu.shinyapps.io/scRNAseq-TGFB-treatment-iAT2s/
 
-## Code authors
-
-- **Lauren J. Ayers** — scRNA-seq, scATAC-seq and SCENIC+ analyses and figure code
-- **Pushpinder S. Bawa** — alignment and preprocessing pipelines, repository organisation
-
 ## Data
 
 Samples (BU1 SFTPC-tdTomato / KRT17-GFP iPSC line, clone 42):
