@@ -1,0 +1,102 @@
+# This config file is used to run scenicplus via snakemake. This REPLACES the 05_scenicplus_prepare_data.sh, as this pipeline prepares the ATAC/RNA data and runs the pipeline
+input_data:
+  cisTopic_obj_fname: "/Users/ljayers/Desktop/scenicoutput/ATAC_06_24_25/ATAC_062425_cistopicobj_30topics_idents.pkl"
+  GEX_anndata_fname: "/Users/ljayers/Desktop/scenic/rna/rna.fixed.h5ad"
+  region_set_folder: "/Users/ljayers/Desktop/scenic/output/ATAC_06_24_25/region_sets"
+  ctx_db_fname: "/Users/ljayers/Desktop/scenic/ATAC_062425.regions_vs_motifs.rankings.feather"
+  dem_db_fname: "/Users/ljayers/Desktop/scenic/ATAC_062425.regions_vs_motifs.scores.feather"
+  path_to_motif_annotations: "/Users/ljayers/Desktop/scenic/aertslab_motif_colleciton/v10nr_clust_public/snapshots/motifs-v10-nr.hgnc-m0.00001-o0.0.tbl"
+
+output_data:
+  # output for prepare_GEX_ACC .h5mu
+  combined_GEX_ACC_mudata: "/Users/ljayers/Desktop/scenic/outs/ACC_GEX.h5mu"
+  # output for motif enrichment results .hdf5
+  dem_result_fname: "/Users/ljayers/Desktop/scenic/outs/dem_results.hdf5"
+  ctx_result_fname: "/Users/ljayers/Desktop/scenic/outs/ctx_results.hdf5"
+  # output html for motif enrichment results .html
+  output_fname_dem_html: "/Users/ljayers/Desktop/scenic/outs/dem_results.html"
+  output_fname_ctx_html: "/Users/ljayers/Desktop/scenic/outs/ctx_results.html"
+  # output for prepare_menr .h5ad
+  cistromes_direct: "/Users/ljayers/Desktop/scenic/outs/cistromes_direct.h5ad"
+  cistromes_extended: "/Users/ljayers/Desktop/scenic/outs/cistromes_extended.h5ad"
+  # output tf names .txt
+  tf_names: "/Users/ljayers/Desktop/scenic/outs/tf_names.txt"
+  # output for download_genome_annotations .tsv
+  genome_annotation: "/Users/ljayers/Desktop/scenic/outs/genome_annotation.tsv"
+  chromsizes: "/Users/ljayers/Desktop/scenic/outs/chromsizes.tsv"
+  # output for search_space .tsb
+  search_space: "/Users/ljayers/Desktop/scenic/outs/search_space.tsv"
+  # output tf_to_gene .tsv
+  tf_to_gene_adjacencies: "/Users/ljayers/Desktop/scenic/outs/tf_to_gene_adj.tsv"
+  # output region_to_gene .tsv
+  region_to_gene_adjacencies: "/Users/ljayers/Desktop/scenic/outs/region_to_gene_adj.tsv"
+  # output eGRN .tsv
+  eRegulons_direct: "/Users/ljayers/Desktop/scenic/outs/eRegulon_direct.tsv"
+  eRegulons_extended: "/Users/ljayers/Desktop/scenic/outs/eRegulons_extended.tsv"
+  # output AUCell .h5mu
+  AUCell_direct: "/Users/ljayers/Desktop/scenic/outs/AUCell_direct.h5mu"
+  AUCell_extended: "/Users/ljayers/Desktop/scenic/outs/AUCell_extended.h5mu"
+  # output scplus mudata .h5mu
+  scplus_mdata: "/Users/ljayers/Desktop/scenic/outs/scplusmdata.h5mu"
+
+params_general:
+  temp_dir: "/Users/ljayers/Desktop/scenic/tmp"
+  n_cpu: 10
+  seed: 666
+
+params_data_preparation:
+  # Params for prepare_GEX_ACC
+  bc_transform_func: "\"lambda x: f'{x}'\""
+  is_multiome: False
+  key_to_group_by: "ident"
+  nr_cells_per_metacells: 10
+  # Params for prepare_menr
+  direct_annotation: "Direct_annot"
+  extended_annotation: "Orthology_annot"
+  # Params for download_genome_annotations
+  species: "hsapiens"
+  biomart_host: "http://www.ensembl.org"
+  # Params for search_space
+  search_space_upstream: "1000 150000"
+  search_space_downstream: "1000 150000"
+  search_space_extend_tss: "10 10"
+
+params_motif_enrichment:
+  species: "homo_sapiens"
+  annotation_version: "v10nr_clust"
+  motif_similarity_fdr: 0.001
+  orthologous_identity_threshold: 0.0
+  annotations_to_use: "Direct_annot Orthology_annot"
+  fraction_overlap_w_dem_database: 0.4
+  dem_max_bg_regions: 500
+  dem_balance_number_of_promoters: True
+  dem_promoter_space: 1_000
+  dem_adj_pval_thr: 0.05
+  dem_log2fc_thr: 1.0
+  dem_mean_fg_thr: 0.0
+  dem_motif_hit_thr: 3.0
+  fraction_overlap_w_ctx_database: 0.4
+  ctx_auc_threshold: 0.005
+  ctx_nes_threshold: 3.0
+  ctx_rank_threshold: 0.05
+
+
+
+
+params_inference:
+  # Params for tf_to_gene
+  tf_to_gene_importance_method: "GBM"
+  # Params regions_to_gene
+  region_to_gene_importance_method: "GBM"
+  region_to_gene_correlation_method: "SR"
+  # Params for eGRN inference
+  order_regions_to_genes_by: "importance"
+  order_TFs_to_genes_by: "importance"
+  gsea_n_perm: 1000
+  quantile_thresholds_region_to_gene: "0.85 0.90 0.95"
+  top_n_regionTogenes_per_gene: "5 10 15"
+  top_n_regionTogenes_per_region: ""
+  min_regions_per_gene: 0
+  rho_threshold: 0.05
+  min_target_genes: 5
+
