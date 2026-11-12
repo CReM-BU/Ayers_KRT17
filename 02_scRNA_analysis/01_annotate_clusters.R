@@ -4,10 +4,13 @@
 # Sub-clusters cluster 1 (TGFB-treated cells) and assigns the cell-type names
 # used throughout the paper.
 #
-# Input : RNA_RAW_RDS        (combined Seurat object from 01_scRNA_preprocessing,
-#                             with `sample` and SCT_snn_res.* metadata)
+# Source: 25_06_25_lauren_RNA-cluster_annotations.R (L. Ayers)
+#
+# Input : RNA_RAW_RDS        (combined Seurat object from 01_scRNA_preprocessing:
+#                             combined/rds/sc.Rds, shared as RNA.rds)
 # Output: RNA_ANNOTATED_RDS  (adds `TGFB.subclustered` and `subcluster_names`)
 #
+# Clusters are from SCT_snn_res.0.25 (Louvain, resolution 0.25; Fig S3A).
 # Methods: "Subclustering was performed on cluster 1 using Seurat's
 #           FindSubCluster() function (resolution = 0.25)."
 #
@@ -46,7 +49,7 @@ rna <- RenameIdents(
   "6"   = "Differentiating Airway",
   "7"   = "Proliferating (proximal)",
   "8"   = "PNEC-like",
-  "9"   = "Non-lung contaminant"   # named "NKX2.1 negative" in earlier drafts
+  "9"   = "Non-lung contaminant"   # "NKX2-1 negative" in the v8 figure PDFs and the Shiny app
 )
 rna$subcluster_names <- Idents(rna)
 

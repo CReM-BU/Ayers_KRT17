@@ -26,8 +26,8 @@ Merges the four per-sample objects (no Harmony integration), SCTransform
 regressing percent.mito, PCA (30 PCs), Louvain clustering at resolutions
 0.05-1.5, UMAP, cell-cycle scoring, and gene-set module scores including the
 Habermann et al. 20-gene sets (Hb_* columns used in Fig 3F / S3C).
-Output: combined/rds/sc.Rds  -> becomes RNA.rds (see README; the step that adds
-the `sample` labels and saves RNA.rds is not yet in the repo).
+Output: combined/rds/sc.Rds (shared as RNA.rds). NOTE: the `sample` and
+`annotation` columns used later are not created in this Rmd.
 This is the CReM bioinformatics core template; chunks with eval=FALSE were not run.
 -->
 

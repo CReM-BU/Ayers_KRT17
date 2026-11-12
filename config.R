@@ -26,7 +26,7 @@ SCENIC_DIR <- Sys.getenv(
 )
 
 # ---- Object names (one lineage; see README "Data objects") -------------------
-RNA_RAW_RDS       <- file.path(DATA_DIR, "RNA.rds")             # output of 01_scRNA_preprocessing (combined)
+RNA_RAW_RDS       <- file.path(DATA_DIR, "RNA.rds")             # = combined/rds/sc.Rds from 01_scRNA_preprocessing, renamed
 RNA_ANNOTATED_RDS <- file.path(DATA_DIR, "rna_annotated.rds")   # output of 02_scRNA_analysis/01_annotate_clusters.R
 ARCHR_PROJECT     <- file.path(DATA_DIR, "LJA_250624_ATAC")     # ArchR project directory
 

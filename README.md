@@ -43,6 +43,7 @@ paths from [`config.R`](config.R).
   fig4.R, figS4.R          Figure 4 and S4 panels
 04_scenicplus/             eRegulon analysis (pycisTopic + custom cisTarget db + SCENIC+)
 05_scTOP/                  scTOP projections (pending)
+06_shiny_app/              ShinyCell app settings (source of Fig 3D, S3E, S3F exports)
 config.R                   paths, colours, themes shared by all R scripts
 ```
 
@@ -51,7 +52,7 @@ config.R                   paths, colours, themes shared by all R scripts
 One object lineage is used throughout (paths set in `config.R`):
 
 ```
-cellranger multi ──> 01_scRNA_preprocessing ──> RNA.rds
+cellranger multi ──> 01_scRNA_preprocessing ──> combined/rds/sc.Rds (shared as RNA.rds)
                                                    │ 02_scRNA_analysis/01_annotate_clusters.R
                                                    ▼
                                            rna_annotated.rds ──> fig3.R, figS3.R

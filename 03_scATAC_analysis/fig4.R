@@ -23,13 +23,21 @@ addArchRThreads(threads = 2)
 
 proj <- loadArchRProject(ARCHR_PROJECT)
 
-ATAC_SAMPLE_COLS <- c(iAT1 = "#D51F26", iAT2 = "#272E6A", iBC = "#208A42", TGFB_iAT2 = "#89288F")
+# ArchR sample names -> names shown in the figure (same as scRNA-seq)
+ATAC_SAMPLE_NAMES <- c(iAT1 = "iAT1s L+DCI", iAT2 = "iAT2s CK+DCI",
+                       iBC = "iBCs PneumacultEx", TGFB_iAT2 = "iAT2s TGFB+DCI")
+proj$SampleName <- unname(ATAC_SAMPLE_NAMES[proj$Sample])
+
+# Figure label "C4: iAT1", "C7_1: KRT5-/KRT17+", ... (cluster ID + cell type)
+proj$ClusterID_Label <- paste0(proj$subclusters, ": ", proj$ClusterLabels)
+id_label_cols <- setNames(CLUSTER_COLS[sub("^[^:]+: ", "", unique(proj$ClusterID_Label))],
+                          unique(proj$ClusterID_Label))
 
 
 # ---- Fig 4A: UMAP coloured by sample (NEW) ----------------------------------------
 pdf(plot_path("fig4A_atac_umap_sample.pdf"), width = 6, height = 5)
 print(
-  plotEmbedding(proj, colorBy = "cellColData", name = "Sample", pal = ATAC_SAMPLE_COLS) +
+  plotEmbedding(proj, colorBy = "cellColData", name = "SampleName", pal = SAMPLE_COLS) +
     theme_seurat() + xlab("umap_1") + ylab("umap_2") + ggtitle("")
 )
 dev.off()
@@ -38,8 +46,7 @@ dev.off()
 # ---- Fig 4B: UMAP coloured by RNA-derived cell-type label (NEW) --------------------
 pdf(plot_path("fig4B_atac_umap_celltype.pdf"), width = 6, height = 5)
 print(
-  plotEmbedding(proj, colorBy = "cellColData", name = "ClusterLabels",
-                pal = CLUSTER_COLS[unique(proj$ClusterLabels)]) +
+  plotEmbedding(proj, colorBy = "cellColData", name = "ClusterID_Label", pal = id_label_cols) +
     theme_seurat() + xlab("umap_1") + ylab("umap_2") + ggtitle("")
 )
 dev.off()
