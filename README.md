@@ -10,11 +10,6 @@ panel-by-panel map of script → output file.
 
 Interactive scRNA-seq browser: https://crem-bu.shinyapps.io/scRNAseq-TGFB-treatment-iAT2s/
 
-## Code authors
-
-- **Lauren J. Ayers** — scRNA-seq, scATAC-seq and SCENIC+ analyses and figure code
-- **Pushpinder S. Bawa** — alignment and preprocessing pipelines, repository organisation
-
 ## Data
 
 Samples (BU1 SFTPC-tdTomato / KRT17-GFP iPSC line, clone 42):
@@ -72,17 +67,36 @@ cellranger-atac ──> 03/01_build_archr_project.R    │            02_markers
 
 ## Software
 
+**scRNA-seq preprocessing** (`01_scRNA_preprocessing`; from `sessionInfo()`, BU SCC, AlmaLinux 8.10)
+
+| Tool | Version |
+|---|---|
+| R | 4.4.3 |
+| Seurat / SeuratObject | 5.5.1 / 5.4.0 |
+| sctransform | 0.4.3 |
+| glmGamPoi | 1.18.0 |
+| presto | 1.0.0 |
+| tidyverse / dplyr / data.table | 2.0.0 / 1.2.1 / 1.17.8 |
+| clustree | 0.5.1 |
+
+**Alignment**
+
 | Tool | Version |
 |---|---|
 | cellranger mkref (scRNA reference) | 3.0.2 |
-| cellranger multi (scRNA) | 9.0.1 |
+| cellranger mkfastq / multi (scRNA) | 9.0.1 |
 | cellranger-atac | 2.1.0 |
-| R | 4.4.0 |
-| Seurat | 5.0.2 |
+
+**Downstream analysis and figures** (`02`–`06`)
+
+| Tool | Version |
+|---|---|
+| Seurat | 5.0.2 *(lib.loc in original figure scripts; to confirm)* |
 | ArchR | 1.0.3 |
-| MAST, fgsea, msigdbr, pheatmap | see `sessionInfo()` at end of each figure script |
+| MAST, fgsea, msigdbr, pheatmap, ggseqlogo | *TBD*: printed by `sessionInfo()` at the end of each figure script |
 | pycisTopic, SCENIC+ | *TBD* |
 | scTOP | 2.0.3 |
+| ShinyCell | *TBD* |
 
 ## Status
 
