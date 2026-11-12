@@ -1,0 +1,14 @@
+[gene-expression]
+reference,/restricted/projectnb/crem-bioinfo/reference_data/REFERENCES/GRCh38_tdtomato_GFP_10X/GRCh38_tdtomato_GFP_10X/
+create-bam,true
+
+[libraries]
+fastq_id,fastqs,feature_types
+AL_KD_OCM_1,/restricted/projectnb/crem-bioinfo/project_workspace/25_06_24_lauren/RNA/calculations/AACW5CLHV/outs/fastq_path/AACW5CLHV/AL_KD_OCM_1,Gene Expression
+
+[samples]
+sample_id,ocm_barcode_ids
+KD_AL_OCM_1,OB1
+KD_AL_OCM_2,OB2
+KD_AL_OCM_3,OB3
+KD_AL_OCM_4,OB4

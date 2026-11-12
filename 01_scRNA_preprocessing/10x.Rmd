@@ -18,6 +18,17 @@ params:
   cell.source: "human"
 ---
 
+<!--
+01_scRNA_preprocessing/10x.Rmd  (KRT17 paper)
+Per-sample QC and processing. Run once per OCM sample (KD_AL_OCM_1..4), see
+run_preprocessing.sh. Reads cellranger multi per_sample_outs, removes
+low-quality cells (<800 genes, percent.mito > params$percent.mito) and
+doublets (nGene / nUMI upper quantile), then SCTransform, PCA, Louvain
+clustering, UMAP and cell-cycle scoring. Output: <sample>/rds/sc.Rds
+This is the CReM bioinformatics core template; chunks with eval=FALSE were not run.
+-->
+
+
 ```{r setup, include=FALSE, cache=FALSE}
 library(future)
 #plan("multiprocess", workers = 2)
