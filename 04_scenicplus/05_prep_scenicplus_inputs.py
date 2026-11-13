@@ -1,7 +1,7 @@
 """
 04_scenicplus/05_prep_scenicplus_inputs.py
 
-Prepares the two SCENIC+ inputs (L. Ayers):
+Prepares the two SCENIC+ inputs (L. Ayers). pycisTopic 2.0a0.
   1. ATAC: rebuilds the cisTopic object, adds the 30-topic LDA model from
      04_pycistopic_lda.py, binarizes topics (otsu and top-3k region sets ->
      region_sets/, used by the Snakemake pipeline), and labels cells with
@@ -132,9 +132,11 @@ for topic in region_bin_topics_top_3k:
 
 
 ### Label cells with cell types (same mapping as 03_scATAC_analysis/02_integrate_cluster_annotate.R)
-# Note: the heatmaps in results/ come from an earlier run that used older names
-# (ABI1 = Pre KRT5-/KRT17+, ABI2 = KRT5-/KRT17+, TGFBUnk/TGFBUnk2, SecretoryLike,
-# iBC1/iBC2) in both the ATAC and RNA objects.
+# Note: the heatmaps in results/ come from an earlier run that used older names in
+# both the ATAC and RNA objects (relabelled in the published figures):
+#   ABI1 -> Pre KRT5-/KRT17+       ABI2          -> KRT5-/KRT17+
+#   TGFBUnk -> SOX high TGFB-treated   TGFBUnk2  -> PNEC-like
+#   SecretoryLike -> Differentiating Airway   iAT1, iAT2, iBC1, iBC2 unchanged
 file_path = outDir + '/ATAC_cisTopicObject_30topics.pkl'
 import pickle
 with open(file_path, 'rb') as file:
