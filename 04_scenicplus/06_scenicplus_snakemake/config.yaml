@@ -1,4 +1,9 @@
-# This config file is used to run scenicplus via snakemake. This REPLACES the 05_scenicplus_prepare_data.sh, as this pipeline prepares the ATAC/RNA data and runs the pipeline
+# SCENIC+ Snakemake config (L. Ayers). Used by run_scenicplus.sh; replaces the
+# old 05_scenicplus_prepare_data.sh (this pipeline prepares the ATAC/RNA data
+# and runs all SCENIC+ steps).
+# Paths are absolute paths on the machine where SCENIC+ was run -- edit them
+# before re-running. Key settings: non-multiome, metacells of 10 cells grouped
+# by "ident" (cell type), seed 666.
 input_data:
   cisTopic_obj_fname: "/Users/ljayers/Desktop/scenicoutput/ATAC_06_24_25/ATAC_062425_cistopicobj_30topics_idents.pkl"
   GEX_anndata_fname: "/Users/ljayers/Desktop/scenic/rna/rna.fixed.h5ad"

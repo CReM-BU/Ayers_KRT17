@@ -34,7 +34,7 @@ scripts listed here make an equivalent plot from the same object.
 | 4A | UMAP by sample | `03_scATAC_analysis/fig4.R` | `fig4A_atac_umap_sample.pdf` | 🆕 |
 | 4B | UMAP by RNA-derived label (with C7 sub-clusters) | `03_scATAC_analysis/fig4.R` | `fig4B_atac_umap_celltype.pdf` | 🆕 |
 | 4C | Marker peak heatmap | `03_scATAC_analysis/fig4.R` | `fig4C_atac_marker_peak_heatmap.pdf` | ✅ |
-| 4D | Cell-type eRegulons (SCENIC+) | `04_scenicplus/` | `04_scenicplus/results/eregulon_*_heatmap.pdf` (outputs only) | ❌ plotting code + later SCENIC+ steps |
+| 4D | Cell-type eRegulons (SCENIC+), subset of cell types | `04_scenicplus/07_plot_regulon_heatmaps.py` | `eregulon_extended_heatmap.pdf` | ✅ |
 
 ## Figure S3 — scRNA-seq
 
@@ -60,7 +60,7 @@ The v9.1 legend letters these panels A, B, B, C, D, E; the PDF letters them A–
 | S4C | Clusters after C7 sub-clustering | `03_scATAC_analysis/figS4.R` | `figS4C_atac_umap_subclusters.pdf` | ✅ |
 | S4D | Label-transfer heatmap, with C7 sub-clusters | `03_scATAC_analysis/figS4.R` | `figS4D_label_transfer_heatmap_subclusters.pdf` | ✅ |
 | S4E | Motif deviations (ridge, logo, UMAP), 6 TFs | `03_scATAC_analysis/figS4.R` | `figS4E_<TF>_{deviation_ridge,motif_logo,deviation_umap}.pdf` | ✅ |
-| S4F | Full eRegulon heatmap | `04_scenicplus/` | `04_scenicplus/results/eregulon_*_heatmap.pdf` (outputs only) | ❌ plotting code |
+| S4F | Full eRegulon heatmap | `04_scenicplus/07_plot_regulon_heatmaps.py` | `eregulon_extended_heatmap.pdf` | ✅ |
 
 ## Supplementary Figures S1, S2, S5, S6
 

@@ -1,8 +1,21 @@
-# This file plots activator regulons in a heatmap for Figure 4D and Supplemental Figure 4F
-# Requires: scplusmdata.h5mu (from SCENIC+ pipeline via Snakemake)
+"""
+04_scenicplus/07_plot_regulon_heatmaps.py
 
+Dot-heatmaps of activator (+/+) eRegulons per cell type (L. Ayers).
+  eregulon_extended_heatmap.pdf -> Fig 4D and Fig S4F
+  eregulon_direct_heatmap.pdf   -> direct (non-orthology) motif annotations only
+Colour = gene-based AUC (target-gene expression), size = region-based AUC
+(accessibility of eRegulon regions).
+
+Requires: scplusmdata.h5mu (06_scenicplus_snakemake/run_scenicplus.sh)
+"""
+import os
 import mudata
-scplus_mdata = mudata.read("outs/scplusmdata.h5mu")
+
+# Same directory as KRT17_SCENIC_DIR / SCENIC_DIR in config.R
+projDir = os.environ.get("KRT17_SCENIC_DIR", "/Users/ljayers/Desktop/scenic").rstrip("/")
+os.chdir(os.path.join(projDir, "outs"))   # heatmaps are saved here
+scplus_mdata = mudata.read("scplusmdata.h5mu")
 
 # Extended eregulon heatmap (Figure 4D and Supplemental Figure 4F)
 

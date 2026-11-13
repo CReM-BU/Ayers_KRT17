@@ -1,13 +1,30 @@
-# This file processes adds the pycistopic model to the cistopic object made from the ATAC data (output: /ATAC_062425_cistopicobj_30topics_idents.pkl)
-# and sets the main expression matrix in the anndata object to logcounts (output: rna.fixed.h5ad)
-# Requires: rna.h5ad and ATAC_062425_Mallet_models_30topics.pkl
+"""
+04_scenicplus/05_prep_scenicplus_inputs.py
 
+Prepares the two SCENIC+ inputs (L. Ayers):
+  1. ATAC: rebuilds the cisTopic object, adds the 30-topic LDA model from
+     04_pycistopic_lda.py, binarizes topics (otsu and top-3k region sets ->
+     region_sets/, used by the Snakemake pipeline), and labels cells with
+     their cell type (`ident`).
+     Output: ATAC_062425_cistopicobj_30topics_idents.pkl
+  2. RNA: sets AnnData .X to log-normalised counts.
+     Output: rna/rna.fixed.h5ad
+
+Requires: outputs of 01_export_inputs.R (pycisTopic_input/, rna/rna.h5ad)
+          and 04_pycistopic_lda.py (ATAC_062425_Mallet_models_30topics.pkl)
+
+Cell-type labels must be IDENTICAL in the ATAC (`ident` below) and RNA
+(`ident` in rna.h5ad = subcluster_names) objects: SCENIC+ pairs ATAC and RNA
+cells into metacells by this label (key_to_group_by: "ident" in
+06_scenicplus_snakemake/config.yaml), and groups without a match are dropped.
+"""
 import logging
 import sys
 import os
 from datetime import datetime
 
-projDir = '/Users/ljayers/Desktop/scenic'
+# Same directory as KRT17_SCENIC_DIR / SCENIC_DIR in config.R
+projDir = os.environ.get('KRT17_SCENIC_DIR', '/Users/ljayers/Desktop/scenic').rstrip('/')
 
 import warnings
 warnings.simplefilter(action='ignore')
@@ -28,7 +45,6 @@ from pycisTopic.cistopic_class import *
 counts = mmread(projDir+"/atac/pycisTopic_input/peak_counts.mtx")
 peaks = pd.read_csv(projDir+"/atac/pycisTopic_input/peaks.tsv", header = None)
 cells = pd.read_csv(projDir+"/atac/pycisTopic_input/cells.tsv", header = None)
-cellmeta = pd.read_csv(projDir+"/atac/pycisTopic_input/cell_metadata.csv")
 counts = counts.tocsr()
 
 # Make cistopic object
@@ -45,7 +61,7 @@ cobj.add_cell_data(cellmeta)
 
 # load model from pycistopic, add to cistopic object
 import pickle
-infile = open('ATAC_062425_Mallet_models_30topics.pkl', 'rb')
+infile = open(os.path.join(outDir, 'ATAC_062425_Mallet_models_30topics.pkl'), 'rb')  # written by 04_pycistopic_lda.py
 model = pickle.load(infile)
 infile.close()
 
@@ -115,7 +131,10 @@ for topic in region_bin_topics_top_3k:
 
 
 
-### Rename clusters with identities
+### Label cells with cell types (same mapping as 03_scATAC_analysis/02_integrate_cluster_annotate.R)
+# Note: the heatmaps in results/ come from an earlier run that used older names
+# (ABI1 = Pre KRT5-/KRT17+, ABI2 = KRT5-/KRT17+, TGFBUnk/TGFBUnk2, SecretoryLike,
+# iBC1/iBC2) in both the ATAC and RNA objects.
 file_path = outDir + '/ATAC_cisTopicObject_30topics.pkl'
 import pickle
 with open(file_path, 'rb') as file:
@@ -126,7 +145,7 @@ mapping = {
     'C2': 'iBC 1',
     'C3': 'PNEC-like',
     'C4': 'iAT1',
-    'C5': 'SOX high TGFB',
+    'C5': 'SOX high TGFB-treated',   # was 'SOX high TGFB' -- must match the RNA label
     'C6': 'iAT2',
     'C7_1': 'KRT5-/KRT17+',
     'C7_2': 'Pre KRT5-/KRT17+',

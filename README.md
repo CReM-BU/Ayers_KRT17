@@ -41,7 +41,13 @@ paths from [`config.R`](config.R).
   01_build_archr_project.R QC, doublets, LSI, peaks, motifs, chromVAR
   02_integrate_cluster_annotate.R  RNA label transfer, clustering, C7 sub-clusters
   fig4.R, figS4.R          Figure 4 and S4 panels
-04_scenicplus/             eRegulon analysis (pycisTopic + custom cisTarget db + SCENIC+)
+04_scenicplus/             eRegulon analysis
+  01_export_inputs.R       ArchR peaks/counts and RNA AnnData export
+  02-03_*.sh               custom cisTarget motif database from the ArchR peak set
+  04_pycistopic_lda.py     30-topic LDA model
+  05_prep_scenicplus_inputs.py  topic region sets, cell-type labels, rna.fixed.h5ad
+  06_scenicplus_snakemake/ SCENIC+ Snakemake config + run script
+  07_plot_regulon_heatmaps.py   Fig 4D / S4F
 05_scTOP/                  scTOP projections (pending)
 06_shiny_app/              ShinyCell app build (Fig 3D, S3E, S3F were exported from it)
 config.R                   paths, colours, themes shared by all R scripts
@@ -62,7 +68,7 @@ cellranger-atac ──> 03/01_build_archr_project.R    │            02_markers
                          └──> 03/02_integrate_cluster_annotate.R ──> fig4.R, figS4.R
                                                    │
                                                    ▼
-                                       04_scenicplus/01_export_inputs.R ──> SCENIC+
+                                       04_scenicplus/01 → 07 ──> scplusmdata.h5mu ──> Fig 4D, S4F
 ```
 
 ## Software
