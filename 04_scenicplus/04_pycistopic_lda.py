@@ -11,8 +11,8 @@ Methods: "the scATAC data was pre-processed with pycisTopic (n_topics = 30)"
 Input : SCENIC_DIR/atac/pycisTopic_input/{peak_counts.mtx, peaks.tsv, cells.tsv, cell_metadata.csv}
 Output: SCENIC_DIR/output/ATAC_06_24_25/ATAC_062425_Mallet_models_30topics.pkl
 
-Next step (MISSING): add models to the cisTopic object, attach cell-type labels,
-and save ATAC_062425_cistopicobj_30topics_idents.pkl (input to step 05).
+Next step: 05_prep_scenicplus_inputs.py (adds the model to the cisTopic object,
+binarizes topics and attaches cell-type labels).
 """
 import os
 import pickle

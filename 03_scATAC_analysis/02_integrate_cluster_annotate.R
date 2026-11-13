@@ -62,14 +62,24 @@ merged[common] <- sub_vec[common]
 proj <- addCellColData(proj, data = merged, name = "subclusters", cells = names(merged), force = TRUE)
 
 # ---- 4. Cell-type labels -------------------------------------------------------------
-# Each (sub)cluster is named after the majority RNA-transferred label (see Fig S4B).
-# The mapping below is the one used in the paper; it depends on the order of
-# unique(proj$subclusters), so check the printed table before using the output.
-labels    <- unique(proj$subclusters)
-newLabels <- c("iAT1", "PNEC-like", "SOX high TGFB-treated", "KRT5-/KRT17+", "iAT2",
-               "iBC 2", "iBC 1", "Pre KRT5-/KRT17+", "Differentiating Airway")
-stopifnot(length(labels) == length(newLabels))
-proj$ClusterLabels <- mapLabels(proj$subclusters, newLabels = newLabels, oldLabels = labels)
+# Each (sub)cluster is named after the majority RNA-transferred label (see Fig S4B/D).
+# Explicit mapping (same as 04_scenicplus/05_prep_scenicplus_inputs.py and the
+# "C#: label" legend of Fig 4B).
+label_map <- c(
+  C1   = "iBC 2",
+  C2   = "iBC 1",
+  C3   = "PNEC-like",
+  C4   = "iAT1",
+  C5   = "SOX high TGFB-treated",
+  C6   = "iAT2",
+  C7_1 = "KRT5-/KRT17+",
+  C7_2 = "Pre KRT5-/KRT17+",
+  C8   = "Differentiating Airway"
+)
+labels <- sort(unique(proj$subclusters))
+stopifnot(setequal(labels, names(label_map)))
+newLabels <- unname(label_map[labels])
+proj$ClusterLabels <- unname(label_map[proj$subclusters])
 
 # Sanity check: assigned label vs. majority predicted RNA label
 majority <- tapply(proj$predictedGroup, proj$subclusters, function(x) names(which.max(table(x))))

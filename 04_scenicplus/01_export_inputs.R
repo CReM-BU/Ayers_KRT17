@@ -11,7 +11,8 @@
 #   atac/pycisTopic_input/{peaks,cells}.tsv
 #   atac/pycisTopic_input/cell_metadata.csv
 #   rna/rna.h5ad                                   RNA counts + log-normalised data
-#   markerpeaks/<subcluster>.bed, DApeaks_union.bed  DARs per sub-cluster
+#   markerpeaks/<subcluster>.bed, DApeaks_union.bed  DARs per sub-cluster (not used by
+#                                                  the final SCENIC+ run, which uses topic region sets)
 #   markerpeaks/ArchR_allPeaks.bed                 all peaks -> cistarget database
 #
 # Run from repo root:  Rscript 04_scenicplus/01_export_inputs.R
