@@ -102,15 +102,11 @@ cellranger-atac ──> 03/01_build_archr_project.R    │            02_markers
 | fgsea | 1.32.4 |
 | msigdbr | 26.1.0 |
 | ArchR | 1.0.3 |
-| pheatmap, ggseqlogo | *TBD*: printed by `sessionInfo()` at the end of each figure script |
+| pheatmap | 1.0.13 |
+| ggseqlogo | 0.2.2 |
 | pycisTopic | 2.0a0 |
 | SCENIC+ | 1.0a2 |
 | pycistarget | 1.1 |
 | Motif collection | aertslab v10nr_clust_public (singletons) |
 | scTOP | 2.0.3 |
-| ShinyCell | *TBD* |
-
-## Status
-
-Code still to be added is listed in [FIGURES.md](FIGURES.md) (❌ / ⏳) and in the
-`TODO` comments inside scripts.
+| ShinyCell | 2.1.0 |
