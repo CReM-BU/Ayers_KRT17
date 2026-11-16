@@ -13,8 +13,8 @@
 # S4E    figS4E_<TF>_deviation_ridge.pdf                ridge plots, 6 motifs
 #        figS4E_<TF>_motif_logo.pdf                     sequence logos
 #        figS4E_<TF>_deviation_umap.pdf                 UMAPs
-# S4F    —                                              full eRegulon heatmap:
-#                                                       MISSING plotting code
+# S4F    —                                              full eRegulon heatmap: made by
+#                                                       04_scenicplus/07_plot_regulon_heatmaps.py
 #
 # Input : ARCHR_PROJECT (after 02_integrate_cluster_annotate.R)
 # Run from repo root:  Rscript 03_scATAC_analysis/figS4.R
@@ -101,6 +101,6 @@ for (tf in names(S4D_MOTIFS)) {
 }
 
 
-# ---- Fig S4F: full eRegulon heatmap -- MISSING (see 04_scenicplus/) ------------------
+# ---- Fig S4F: full eRegulon heatmap -- see 04_scenicplus/07_plot_regulon_heatmaps.py --
 
 sessionInfo()

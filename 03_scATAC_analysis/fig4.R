@@ -6,8 +6,8 @@
 # 4A     fig4A_atac_umap_sample.pdf          NEW plotting code (not saved in original repo)
 # 4B     fig4B_atac_umap_celltype.pdf        NEW plotting code (not saved in original repo)
 # 4C     fig4C_atac_marker_peak_heatmap.pdf
-# 4D     —                                   SCENIC+ eRegulon dot-heatmap: MISSING
-#                                            plotting code; see 04_scenicplus/
+# 4D     —                                   SCENIC+ eRegulon dot-heatmap: made by
+#                                            04_scenicplus/07_plot_regulon_heatmaps.py
 # 4E-G   —                                   flow cytometry / Prism (not in repo)
 #
 # Input : ARCHR_PROJECT (after 02_integrate_cluster_annotate.R)
@@ -70,6 +70,6 @@ ComplexHeatmap::draw(heatmapPeaks)
 dev.off()
 
 
-# ---- Fig 4D: eRegulon dot-heatmap -- MISSING (see 04_scenicplus/) ----------------
+# ---- Fig 4D: eRegulon dot-heatmap -- see 04_scenicplus/07_plot_regulon_heatmaps.py --
 
 sessionInfo()
