@@ -65,3 +65,16 @@ The v9.1 legend letters these panels A, B, B, C, D, E; the PDF letters them A–
 ## Supplementary Figures S1, S2, S5, S6
 
 No computational panels (gels, karyotype, flow cytometry, RT-qPCR, imaging).
+
+## Edits made after plotting (Adobe Illustrator)
+
+The scripts produce the plots as they came out of R/Python. These panels were then
+edited by hand for layout and readability; no data were changed.
+
+| Panel | Edits |
+|---|---|
+| 4D | Cropped to a subset of cell types (full heatmap in S4F); narrower columns; column labels rewritten; columns colored by cluster color |
+| S4F | Narrower columns; column labels rewritten; columns colored by cluster color |
+| 4D, S4F | Group labels renamed from the SCENIC+ run names: ABI1 → Pre KRT5-/KRT17+, ABI2 → KRT5-/KRT17+, TGFBUnk → SOX high TGFB-treated, TGFBUnk2 → PNEC-like, SecretoryLike → Differentiating Airway |
+| UMAPs (several) | Cluster labels moved slightly for visibility. *TODO (Lauren): list the panels.* |
+

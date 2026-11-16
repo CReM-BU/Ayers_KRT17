@@ -2,11 +2,15 @@
 04_scenicplus/07_plot_regulon_heatmaps.py
 
 Dot-heatmaps of activator (+/+) eRegulons per cell type (L. Ayers).
-  eregulon_extended_heatmap.pdf -> Fig 4D and Fig S4F
+  eregulon_extended_heatmap.pdf -> Fig S4F (all cell types) and Fig 4D
+                                   (cropped by hand to a subset of cell types)
   eregulon_direct_heatmap.pdf   -> direct (non-orthology) motif annotations only
 Colour = gene-based AUC (target-gene expression), size = region-based AUC
 (accessibility of eRegulon regions).
 
+See FIGURES.md for edits made afterwards in Adobe Illustrator.
+
+SCENIC+ 1.0a2.
 Requires: scplusmdata.h5mu (06_scenicplus_snakemake/run_scenicplus.sh)
 """
 import os
