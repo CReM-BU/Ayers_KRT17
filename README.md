@@ -21,7 +21,7 @@ Samples (BU1 SFTPC-tdTomato / KRT17-GFP iPSC line, clone 42):
 | iAT1s in L+DCI | `iAT1s L+DCI` | `iAT1` |
 | iBCs in Pneumacult Ex+ | `iBCs PneumacultEx` | `iBC` |
 
-Raw and processed data: GEO accession *TBD*.
+Raw and processed data: GEO accession scATAC-GSE350019 and scRNA-GSE350033
 
 ## Repository layout
 
