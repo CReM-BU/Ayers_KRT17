@@ -1,11 +1,15 @@
 # scTOP analysis (Fig 3G, 3H, S3H)
 
-**Pending** — this analysis was run by a collaborator and the code will be added here.
+Analysis performed by Eitan Vilker
 
-Methods (from the manuscript): scTOP v2.0.3; reference basis built from LungMAP
-Human Lung CellRef AT1, AT2, basal, club, goblet and ciliated cells (downsampled
-to 500 cells per type) plus Habermann et al. KRT5-/KRT17+ cells (485 cells);
-ANOVA feature selection to the top 20% of genes.
+## Core Package Versions
+scTOP v2.0.3
+SimilarityHelper and TopObject commit x
 
-Code currently referenced in the manuscript:
-https://github.com/CReM-BU/Vilker_Helper_Files/tree/main/KRT17_Reporter
+## Reference Basis Construction
+Reference basis used in analysis was constructed from cell types of two datasets. These were:
+1. Guo et al LungMAP Human Lung CellRef AT1, AT2, basal, club, goblet and ciliated cells (downsampled
+to 500 cells per type)
+2. Habermann et al. KRT5-/KRT17+ cells (485 cells)
+   
+ANOVA feature selection was then applied to select the top 20% of genes for successfully recapitulating original annotations.
