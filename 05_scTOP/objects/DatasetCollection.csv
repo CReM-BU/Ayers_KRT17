@@ -1,0 +1,2 @@
+Name,cellTypeColumn,toKeep,toExclude,filePath,timeColumn,species,duplicates,raw,layer,Comments
+Ayers_06_24_25,subcluster_names,"[KRT5-/KRT17+, PreKRT5-/KRT17+, iAT1, iAT2, iBC 1, iBC 2, SOX high TGFB-treated]",,/restricted/projectnb/crem-trainees/Kotton_Lab/Eitan/Lauren/objects/Ayers_06_24_25.h5ad,,human,,,,"iAT2, iAT1, TGFB-iAT2, and iBC samples"
